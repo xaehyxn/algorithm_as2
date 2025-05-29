@@ -159,6 +159,44 @@ void prim(int n, double** graph, int* parent) {
         parent[i] = -1;
     }
 
+    key[0] = 0; // 첫번째(0번째) 
     MinHeap heap(n); // 크기 n짜리 힙 만들기 (n == demension)
+    
+    for (int i = 0; i < n; i++) { // heap의 루트를 제외한 모든 노드의 key값은 거의 센티널값으로 설정
+        heap.insert(i, key[i]);
+    }
 
+    while (!heap.is_empty()) {
+        HeapNode min_node = heap.out_min(); // 루트 노드(키 값이 가장 작은 노드)를 가져와서 MST에 포함시키기
+        int min_index = min_node.vertex;
+        in_MST[min_index] = true;
+
+        for (int i = 0; i < n; i++) {
+            if (!in_MST[i] && graph[min_index][i] < key[i]) {
+                key[i] = graph[min_index][i];
+                parent[i] = min_index; 
+                heap.change_key(i, key[i]);
+            }
+        }
+    }
+
+    delete[] key;
+    delete[] in_MST;
+}
+
+// heap기반 prim -> MST 구성 -> DFS를 이용한 전위 순회 -> tour(순회 경로) 완성
+void DFS(int now_node_index, bool* visited, int* parent, int n, int* tour, int& index) {
+    visited[now_node_index] = true; // 현재 노드 방문
+    tour[index] = now_node_index;
+    index++;
+
+    for (int i = 0; i < n; i++) {
+        if (parent[i] == now_node_index && !visited[i]) {
+            DFS(i, visited, parent, n, tour, index);
+        }
+    }
+}
+
+double tour_cost(int* tour, double** coords, int n) {
+    
 }
