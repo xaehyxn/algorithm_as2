@@ -7,7 +7,7 @@
 
 using namespace std;
 
-// tsp 파일 파싱하기 (LLM 활용) 
+// tsp 파일 파싱하기 (LLM 활용) -> dimension(정점 개수) 반환
 int read_tsp(const char* filename, double*** coords_ptr) {
     FILE* fp = fopen(filename, "r");
     if (!fp) {
