@@ -79,11 +79,28 @@ public:
     }
 
     void heapify_down(int index) {
+        int now = index;
+        int left = index * 2 + 1;
+        int right = index * 2 + 2;
 
+        if (left < size && array[left].key < array[now].key) {
+            now = left;
+        }
+        if (right < size && array[right].key < array[now].key) {
+            now = right;
+        }
+
+        if (now != index) {
+            swap(now, index);
+            heapify_down(now);
+        }
     }
 
     void heapify_up(int index) {
-
+        while(index > 0 && array[index].key < array[(index - 1)/2].key) {
+            swap(index, (index-1)/2);
+            index = (index-1)/2;
+        }
     }
 
     // 정점 번호 i이며 key 값(위치)이 j인 노드를 힙에 넣을때
@@ -125,6 +142,23 @@ public:
 
     // pos 배열 안에 i(tsp파일 내에서의 정점(도시 등)의 인덱스)가 있는지 확인
     bool in_heap(int i) {
-
+        return pos[i] != -1;
     }
 };
+
+// heap기반 prim알고리즘 -> MST 구성하기
+#define DOUBLE_MAX 1.7e+308 // LLM활용 -> 대략적인 double타입 최대값 가져옴
+
+void prim(int n, double** graph, int* parent) {
+    double* key = new double[n];
+    bool* in_MST = new bool[n];
+
+    for (int i = 0; i < n; i++) {
+        key[i] = DOUBLE_MAX;
+        in_MST[i] = false;
+        parent[i] = -1;
+    }
+
+    MinHeap heap(n); // 크기 n짜리 힙 만들기 (n == demension)
+
+}
