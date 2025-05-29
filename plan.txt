@@ -1,0 +1,3 @@
+tsp에서 각 줄 (index x y)을 읽어와서 저장
+Prim 알고리즘으로 MST 구하기
+MST 기반 근사기법 사용
