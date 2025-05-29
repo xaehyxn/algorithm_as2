@@ -198,5 +198,11 @@ void DFS(int now_node_index, bool* visited, int* parent, int n, int* tour, int& 
 }
 
 double tour_cost(int* tour, double** coords, int n) {
-    
+    double cost = 0;
+    for (int i = 0; i < n; i++) {
+        int a = tour[i];
+        int b = tour[(i+1) % n];
+        cost += distance(coords[a][0], coords[a][1], coords[b][0], coords[b][1]);
+    }
+    return cost;
 }
