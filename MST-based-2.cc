@@ -197,6 +197,7 @@ void DFS(int now_node_index, bool* visited, int* parent, int n, int* tour, int& 
     }
 }
 
+// TSP 결과값( 코스트) 계산하기
 double tour_cost(int* tour, double** coords, int n) {
     double cost = 0;
     for (int i = 0; i < n; i++) {
@@ -204,5 +205,46 @@ double tour_cost(int* tour, double** coords, int n) {
         int b = tour[(i+1) % n];
         cost += distance(coords[a][0], coords[a][1], coords[b][0], coords[b][1]);
     }
+    return cost;
+}
+
+// mst 기반 2근사 알고리즘 구현하기 (거리그래프 생성 -> MST 구성(prim 활용) -> DFS로 전위순회하며 TSP 경로 생성 -> 비용계산)
+double mst_based_2_approximation(int n, double** coords) {
+    // 거리 그래프 생성하기
+    double** graph = new double*[n];
+    for (int i = 0; i < n; i++) {
+        graph[i] = new double[n];
+        for (int j = 0; j < n; j++) {
+            graph[i][j] = distance(coords[i][0], coords[i][1], coords[j][0], coords[j][1]);
+        }
+    }
+
+    // MST 구성하기
+    int* parent = new int[n];
+    prim(n, graph, parent);
+
+    // DFS 전위순회 -> TSP 경로 생성
+    bool* visited = new bool[n];
+    for (int i = 0; i < n; i++) {
+        visited[i] = false;
+    }
+    int* tour = new int[n];
+    int index = 0;
+    DFS(0, visited, parent, n, tour, index);
+
+    // TSP 경로 cost 계산하기
+    double cost = tour_cost(tour, coords, n);
+
+    // 메모리 해제하기
+    for (int i = 0; i < n; i++) {
+        delete[] graph[i];
+    }
+    delete[] graph;
+
+    delete[] parent;
+    delete[] visited;
+    delete[] tour;
+
+    // TSP 경로 cost 반환하기
     return cost;
 }
