@@ -33,7 +33,10 @@ int read_tsp(const char* filename, double*** coords_ptr) {
     for (int i = 0; i < n; ++i) {
         coords[i] = new double[2];
         int idx;
-        fscanf(fp, "%d %lf %lf", &idx, &coords[i][0], &coords[i][1]);
+        if (fscanf(fp, "%d %lf %lf", &idx, &coords[i][0], &coords[i][1]) != 3) {
+            fprintf(stderr, "tsp 파일의 포맷이 잘못되었습니다 (좌표 파싱 실패)\n");
+            exit(1);
+        }
     }
 
     fclose(fp);
@@ -133,10 +136,10 @@ public:
         double old_key = array[j].key;
         array[j].key = new_key;
         if (old_key < new_key) {
-            heapify_down(i);
+            heapify_down(j);
         }
         else {
-            heapify_up(i);
+            heapify_up(j);
         }
     }
 
@@ -247,4 +250,29 @@ double mst_based_2_approximation(int n, double** coords) {
 
     // TSP 경로 cost 반환하기
     return cost;
+}
+
+// 테스트용 메인 함수
+int main(int argc, char* argv[]) {
+    if (argc < 2) {
+        return -1;
+    }
+
+    double** coords;
+    int n = read_tsp(argv[1], &coords);
+
+    clock_t start = clock();
+    double cost = mst_based_2_approximation(n, coords);
+    clock_t end = clock();
+
+    printf("도시 수: %d\n", n);
+    printf("근사 투어 비용: %.2f\n", cost);
+    printf("실행 시간: %.4f 초\n", (double)(end - start) / CLOCKS_PER_SEC);
+
+    for (int i = 0; i < n; i++) {
+        delete[] coords[i];
+    }
+    delete[] coords;
+
+    return 0;
 }
