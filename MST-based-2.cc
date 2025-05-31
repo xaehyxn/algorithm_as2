@@ -7,10 +7,15 @@
 
 using namespace std;
 
-// 각 도시(x, y)간의 거리 구하기
-double distance(int x1, int y1, int x2, int y2) {
-    return sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+// 각 도시(x, y)간의 거리 구하기 -> 100K에서 killed 뜸 -> 개선하기(graph사용 x)
+// double distance(int x1, int y1, int x2, int y2) {
+//     return sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+// }
+inline double distance(int a, int b, double** coords) {
+    return sqrt((coords[a][0] - coords[b][0]) * (coords[a][0] - coords[b][0]) + 
+                (coords[a][1] - coords[b][1]) * (coords[a][1] - coords[b][1]));
 }
+
 
 // tsp 파일 파싱하기 (LLM 활용) -> dimension(정점 개수) 반환
 int read_tsp(const char* filename, double*** coords_ptr) {
@@ -152,7 +157,8 @@ public:
 // heap기반 prim알고리즘 -> MST 구성하기
 #define DOUBLE_MAX 1.7e+308 // LLM활용 -> 대략적인 double타입 최대값 가져옴
 
-void prim(int n, double** graph, int* parent) {
+// void prim(int n, double** graph, int* parent) {
+void prim(int n, double** coords, int* parent) {
     double* key = new double[n];
     bool* in_MST = new bool[n];
 
@@ -175,12 +181,23 @@ void prim(int n, double** graph, int* parent) {
         in_MST[min_index] = true;
 
         for (int i = 0; i < n; i++) {
-            if (!in_MST[i] && graph[min_index][i] < key[i]) {
-                key[i] = graph[min_index][i];
-                parent[i] = min_index; 
-                heap.change_key(i, key[i]);
+            if (!in_MST[i]) {
+                double dist = distance(min_index, i, coords);
+                if (dist < key[i]) {
+                    key[i] = dist;
+                    parent[i] = min_index;
+                    heap.change_key(i, dist);
+                }
             }
         }
+
+        // for (int i = 0; i < n; i++) {
+        //     if (!in_MST[i] && graph[min_index][i] < key[i]) {
+        //         key[i] = graph[min_index][i];
+        //         parent[i] = min_index; 
+        //         heap.change_key(i, key[i]);
+        //     }
+        // }
     }
 
     delete[] key;
@@ -206,25 +223,25 @@ double tour_cost(int* tour, double** coords, int n) {
     for (int i = 0; i < n; i++) {
         int a = tour[i];
         int b = tour[(i+1) % n];
-        cost += distance(coords[a][0], coords[a][1], coords[b][0], coords[b][1]);
+        cost += distance(a, b, coords);
     }
     return cost;
 }
 
 // mst 기반 2근사 알고리즘 구현하기 (거리그래프 생성 -> MST 구성(prim 활용) -> DFS로 전위순회하며 TSP 경로 생성 -> 비용계산)
 double mst_based_2_approximation(int n, double** coords) {
-    // 거리 그래프 생성하기
-    double** graph = new double*[n];
-    for (int i = 0; i < n; i++) {
-        graph[i] = new double[n];
-        for (int j = 0; j < n; j++) {
-            graph[i][j] = distance(coords[i][0], coords[i][1], coords[j][0], coords[j][1]);
-        }
-    }
+    // 거리 그래프 생성하기 -> 개선하기 (graph 사용 x)
+    // double** graph = new double*[n];
+    // for (int i = 0; i < n; i++) {
+    //     graph[i] = new double[n];
+    //     for (int j = 0; j < n; j++) {
+    //         graph[i][j] = distance(coords[i][0], coords[i][1], coords[j][0], coords[j][1]);
+    //     }
+    // }
 
     // MST 구성하기
     int* parent = new int[n];
-    prim(n, graph, parent);
+    prim(n, coords, parent);
 
     // DFS 전위순회 -> TSP 경로 생성
     bool* visited = new bool[n];
@@ -239,10 +256,10 @@ double mst_based_2_approximation(int n, double** coords) {
     double cost = tour_cost(tour, coords, n);
 
     // 메모리 해제하기
-    for (int i = 0; i < n; i++) {
-        delete[] graph[i];
-    }
-    delete[] graph;
+    // for (int i = 0; i < n; i++) {
+    //     delete[] graph[i];
+    // }
+    // delete[] graph;
 
     delete[] parent;
     delete[] visited;
@@ -265,9 +282,9 @@ int main(int argc, char* argv[]) {
     double cost = mst_based_2_approximation(n, coords);
     clock_t end = clock();
 
-    printf("도시 수: %d\n", n);
-    printf("근사 투어 비용: %.2f\n", cost);
-    printf("실행 시간: %.4f 초\n", (double)(end - start) / CLOCKS_PER_SEC);
+    printf("Number of cities: %d\n", n);
+    printf("Approximate tour cost: %.2f\n", cost);
+    printf("Execution time: %.2f ms\n", (double)(end - start) * 1000 / CLOCKS_PER_SEC);
 
     for (int i = 0; i < n; i++) {
         delete[] coords[i];
