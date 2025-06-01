@@ -1,3 +1,5 @@
-tsp에서 각 줄 (index x y)을 읽어와서 저장
-Prim 알고리즘으로 MST 구하기
-MST 기반 근사기법 사용
+(MST 기반 근사기법)
+- tsp에서 각 줄 (index x y)을 읽어와서 저장
+- Prim 알고리즘으로 MST 구하기
+- 만들어둔 MST를 parent를 이용해서 DFS 전위 순회
+- 투어비용 계산 
