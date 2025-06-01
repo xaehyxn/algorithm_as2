@@ -63,11 +63,11 @@ double held_karp(int n, double** coords) {
 
     for (int mask = 1; mask < total; mask++) { // 2^n번 반복 -> 가능한 모든 조합을 반복
         for (int end = 0; end < n; end++) {
-            if (!(mask && (1 << end))) {
+            if (!(mask & (1 << end))) {
                 continue; // end를 마지막으로 방문해야 하는데, end자체가 방문 조합에 포함 X -> 다음 반복문 시작
             }
             for (int next = 0; next < n; next++) {
-                if (mask && (1 << next)) {
+                if (mask & (1 << next)) {
                     continue; // 다음으로 next를 방문해야 하는데, 이미 방문 조합에 포함 -> 다음 반복문 시작
                 } 
 
@@ -94,7 +94,7 @@ double held_karp(int n, double** coords) {
     }
     delete[] dp;
 
-    return min_cost;
+    return min_cost; 
 }
 
 // 테스트용 메인 함수
