@@ -37,12 +37,31 @@ int read_tsp(const char* filename, double*** coords_ptr) {
     for (int i = 0; i < n; ++i) {
         coords[i] = new double[2];
         int idx;
-        fscanf(fp, "%d %lf %lf", &idx, &coords[i][0], &coords[i][1]);
+        if (fscanf(fp, "%d %lf %lf", &idx, &coords[i][0], &coords[i][1]) != 3) {
+            fprintf(stderr, "tsp 파일의 포맷이 잘못되었습니다 (좌표 파싱 실패)\n");
+            exit(1);
+        }
     }
 
     fclose(fp);
     *coords_ptr = coords;
     return n;
+}
+
+// Held-Karp 알고리즘 구현하기
+double held_karp(int n, double** coords) {
+    int total = 1 << n; // total -> 2^n 즉, 가능한 방문 조합 수
+    double** dp = new double*[total]; 
+    // dp[방문 조합][마지막 방문 도시]의 형태, 저장 되는 값은 해당 조합을 모두 방문하면서 마지막 방문 도시에 도착했을 때의 최소 비용 저장
+    for (int i = 0; i < total; ++i) {
+        dp[i] = new double[n];
+        for (int j = 0; j < n; ++j)
+            dp[i][j] = 1e9;  // 처음에 모든 비용을 무한대(큰 값)로 저장해두고, 이후 비교를 통해 줄여나갈 예정
+    }
+
+
+
+    
 }
 
 // 테스트용 메인 함수
