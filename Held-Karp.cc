@@ -59,9 +59,37 @@ double held_karp(int n, double** coords) {
             dp[i][j] = 1e9;  // 처음에 모든 비용을 무한대(큰 값)로 저장해두고, 이후 비교를 통해 줄여나갈 예정
     }
 
+    dp[1][0] = 0.0; // 0번 도시를 출발점으로 설정
+
+    for (int mask = 1; mask < total; mask++) { // 2^n번 반복 -> 가능한 모든 조합을 반복
+        for (int end = 0; end < n; end++) {
+            if (!(mask && (1 << end))) {
+                continue; // end를 마지막으로 방문해야 하는데, end자체가 방문 조합에 포함 X -> 다음 반복문 시작
+            }
+            for (int next = 0; next < n; next++) {
+                if (mask && (1 << next)) {
+                    continue; // 다음으로 next를 방문해야 하는데, 이미 방문 조합에 포함 -> 다음 반복문 시작
+                } 
+
+                double cost = dp[mask][end] + distance(end, next, coords); 
+                int next_mask = mask | (1 << next);
+                if (cost < dp[next_mask][next]) {
+                    dp[next_mask][next] = cost;
+                }
+            }
+        }
+    }
+
+    double min_cost = 1e9; // 무한대(큰 값)으로 초기화
+    int final_mask = total - 1; // 모든 도시를 방문한 조합 -> 1111111111111...1111111111
+    for (int end = 1; end < n; end++) {
+        double cost = dp[final_mask][end] + distance(end, 0, coords); 
+        if (cost < min_cost) {
+            min_cost = cost;
+        }
+    }
 
 
-    
 }
 
 // 테스트용 메인 함수
