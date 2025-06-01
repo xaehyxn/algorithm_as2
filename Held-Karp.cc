@@ -89,7 +89,12 @@ double held_karp(int n, double** coords) {
         }
     }
 
+    for (int i = 0; i < total; i++) {
+        delete[] dp[i];
+    }
+    delete[] dp;
 
+    return min_cost;
 }
 
 // 테스트용 메인 함수
