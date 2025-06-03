@@ -204,6 +204,34 @@ double kruskal_tsp_approximation(int num_cities, double** coords, int* tour) {
         current = next_city;
     }
 
+    // 투어 검증용 코드 (LLM(CHAT-GPT) 활용)
+    bool* seen = new bool[num_cities];
+    for (int i = 0; i < num_cities; i++) {
+        seen[i] = false;
+    }
+    bool error = false;
+    for (int i = 0; i < num_cities; i++) {
+        if (tour[i] < 0 || tour[i] >= num_cities) {
+            printf("Tour index out of range: %d at pos %d\n", tour[i], i);
+            error = true;
+        }
+        else if (seen[tour[i]]) {
+            printf("Duplicate city in tour: %d\n", tour[i]);
+            error = true;
+        }
+        seen[tour[i]] = true;
+    }
+    for (int i = 0; i < num_cities; i++) {
+        if (!seen[i]) {
+            printf("Missing city in tour: %d\n", i);
+            error = true;
+        }
+    }
+    delete[] seen;
+    if (error) {
+        printf("[ERROR] Tour contains errors!\n");
+    }
+
     delete[] edges;
     delete[] parent;
     delete[] set_size;
@@ -218,10 +246,6 @@ double kruskal_tsp_approximation(int num_cities, double** coords, int* tour) {
 
     return cost;   
 }
-
-
-
-
 
 int main(int argc, char* argv[]) {
     if (argc < 2) return -1;
