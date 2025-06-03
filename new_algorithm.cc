@@ -172,11 +172,49 @@ double kruskal_tsp_approximation(int num_cities, double** coords, int* tour) {
         cost += selected_edges[i].cost;
     }
 
+    // 인접 리스트(adjacency list)로 변환
+    int** adjacency = new int*[num_cities];
+    int* neighbor_count = new int[num_cities];
+    for (int i = 0; i < num_cities; i++) {
+        adjacency[i] = new int[2];
+        neighbor_count[i] = 0;
+    }
+    for (int i = 0; i < num_cities; i++) {
+        int u = selected_edges[i].city_u, v = selected_edges[i].city_v;
+        adjacency[u][neighbor_count[u]++] = v;
+        adjacency[v][neighbor_count[v]++] = u;
+    }
+
+    // 투어 만들기
+    bool* visited = new bool[num_cities];
+    for (int i = 0; i < num_cities; i++) visited[i] = false;
+    int current = 0, position = 0;
+    tour[position++] = current;
+    visited[current] = true;
+    while (position < num_cities) {
+        int next_city = -1;
+        for (int j = 0; j < 2; j++) {
+            if (!visited[adjacency[current][j]]) {
+                next_city = adjacency[current][j];
+                break;
+            }
+        }
+        tour[position++] = next_city;
+        visited[next_city] = true;
+        current = next_city;
+    }
+
     delete[] edges;
     delete[] parent;
     delete[] set_size;
     delete[] degree;
     delete[] selected_edges;
+    for (int i = 0; i < num_cities; ++i) {
+        delete[] adjacency[i];
+    }
+    delete[] adjacency;
+    delete[] neighbor_count;
+    delete[] visited;
 
     return cost;   
 }
