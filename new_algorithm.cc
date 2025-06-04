@@ -254,13 +254,19 @@ int main(int argc, char* argv[]) {
 
     int* tour = new int[num_cities];
 
-    clock_t start = clock();
-    double cost = kruskal_tsp_approximation(num_cities, coords, tour); // 이름 바꿀 예정
-    clock_t end = clock();
+    double cost = 0.0000;
+    double average_time = 0.0000;
+    for (int i = 0; i < 5; i++) {
+        clock_t start = clock();
+        cost = kruskal_tsp_approximation(num_cities, coords, tour);
+        clock_t end = clock();
+        average_time += (double)(end - start) * 1000 / CLOCKS_PER_SEC;
+    }
+    average_time = (double)average_time/5.0;
 
     printf("Number of cities: %d\n", num_cities);
     printf("Approximate tour cost: %.2f\n", cost);
-    printf("Execution time: %.2f ms\n", (double)(end - start) * 1000 / CLOCKS_PER_SEC);
+    printf("average time: %.3f ms\n", average_time);
 
     for (int i = 0; i < num_cities; ++i) {
         delete[] coords[i];

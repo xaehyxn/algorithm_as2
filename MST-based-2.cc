@@ -146,7 +146,7 @@ public:
         else {
             heapify_up(j);
         }
-    }
+    }   
 
     // pos 배열 안에 i(tsp파일 내에서의 정점(도시 등)의 인덱스)가 있는지 확인
     bool in_heap(int i) {
@@ -278,13 +278,19 @@ int main(int argc, char* argv[]) {
     double** coords;
     int n = read_tsp(argv[1], &coords);
 
-    clock_t start = clock();
-    double cost = mst_based_2_approximation(n, coords);
-    clock_t end = clock();
+    double cost = 0.0000;
+    double average_time = 0.0000;
+    for (int i = 0; i < 5; i++) {
+        clock_t start = clock();
+        cost = mst_based_2_approximation(n, coords);
+        clock_t end = clock();
+        average_time += (double)(end - start) * 1000 / CLOCKS_PER_SEC;
+    }
+    average_time = (double)average_time/5.0;
 
     printf("Number of cities: %d\n", n);
     printf("Approximate tour cost: %.2f\n", cost);
-    printf("Execution time: %.2f ms\n", (double)(end - start) * 1000 / CLOCKS_PER_SEC);
+    printf("average time: %.3f ms\n", average_time);
 
     for (int i = 0; i < n; i++) {
         delete[] coords[i];
